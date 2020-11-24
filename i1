@@ -1,0 +1,28 @@
+import numpy as np
+from scipy.special import erf, erfinv
+def gaussian_frequency(array_length = 10000, central_freq = 100, std = 10):
+    n = np.arange(array_length)
+    f = np.sqrt(2)*std*erfinv(2*n/array_length - erf(central_freq/np.sqrt(2)/std)) + central_freq
+    return f
+f = gaussian_frequency()
+phi = np.linspace(0,2*np.pi, len(f))
+t = np.linspace(0,100,100000)
+signal = np.zeros(len(t))
+for k in range(len(f)):
+    signal += np.sin(phi[k] + 2*np.pi*f[k]*t)
+def fourierPlt(signal, TIMESTEP = .001):
+    num_samples = len(signal)
+    k = np.arange(num_samples)
+    Fs = 1/TIMESTEP
+    T = num_samples/Fs
+    frq = k/T # two sides frequency range
+    frq = frq[range(int(num_samples/2))] # one side frequency range
+    fourier = np.fft.fft(signal)/num_samples # fft computing and normalization
+    fourier = abs(fourier[range(int(num_samples/2))])
+    fourier = fourier/sum(fourier)
+    plt.plot(frq, fourier, 'r', linewidth = 1)
+    plt.title("Fast Fourier Transform")
+    plt.xlabel('$f$/Hz')
+    plt.ylabel('Normalized Spectrum')
+    return(frq, fourier)
+fourierPlt(signal)
